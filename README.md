@@ -12,9 +12,10 @@ Or simply copy the `vimv` file to a location in your `$PATH` and make it executa
 
 ## Usage
 
-1. Go to a directory and enter `vimv`. A Vim window will be opened with names of all files.
-2. Use Vim's text editing features to edit the names of files. For example, search and replace a particular string, or use visual selection to delete a block.
-3. Save and exit. Your files should be renamed now.
+1. Go to a directory and enter `vimv` with optionally, a list of files to rename.
+2. A Vim window will be opened with names of all files.
+3. Use Vim's text editing features to edit the names of files. For example, search and replace a particular string, or use visual selection to delete a block.
+4. Save and exit. Your files should be renamed now.
 
 ## Other features
 
