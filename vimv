@@ -11,7 +11,7 @@ for ((i=0;i<${#src[@]};++i)); do
     echo "${src[i]}" >> /tmp/vimv.$$
 done
 
-vi /tmp/vimv.$$
+$EDITOR /tmp/vimv.$$
 
 IFS=$'\r\n' GLOBIGNORE='*' command eval  'dest=($(cat /tmp/vimv.$$))'
 
