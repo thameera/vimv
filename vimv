@@ -17,7 +17,6 @@ IFS=$'\r\n' GLOBIGNORE='*' command eval  'arr2=($(cat /tmp/vimv.$$))'
 
 for ((i=0;i<${#arr1[@]};++i)); do
     if [ "${arr1[i]}" != "${arr2[i]}" ]; then
-        printf "%s    --->    %s\n" "${arr1[i]}" "${arr2[i]}"
         mv "${arr1[i]}" "${arr2[i]}"
     fi
 done
