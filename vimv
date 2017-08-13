@@ -1,10 +1,14 @@
 #!/bin/bash
 
 # Lists the current directory's files in Vim, so you can edit it and save to rename them
-# USAGE: vimv
+# USAGE: vimv [file1 file2]
 # https://github.com/thameera/vimv
 
-IFS=$'\r\n' GLOBIGNORE='*' command eval  'src=($(ls))'
+if [ $# -ne 0 ]; then
+    src=( "$@" )
+else
+    IFS=$'\r\n' GLOBIGNORE='*' command eval  'src=($(ls))'
+fi
 
 touch /tmp/vimv.$$
 for ((i=0;i<${#src[@]};++i)); do
