@@ -15,10 +15,14 @@ vi /tmp/vimv.$$
 
 IFS=$'\r\n' GLOBIGNORE='*' command eval  'arr2=($(cat /tmp/vimv.$$))'
 
+count=0
 for ((i=0;i<${#arr1[@]};++i)); do
     if [ "${arr1[i]}" != "${arr2[i]}" ]; then
         mv "${arr1[i]}" "${arr2[i]}"
+        ((count++))
     fi
 done
+
+echo "$count" files renamed.
 
 rm /tmp/vimv.$$
