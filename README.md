@@ -19,6 +19,7 @@ Or simply copy the `vimv` file to a location in your `$PATH` and make it executa
 
 ## Other features
 
+* If you want to list only a group of files, you can pass them as an argument. eg: `vimv *.mp4`
 * If you have an `$EDITOR` environment variable set, vimv will use its value by default.
 * If you are inside a Git directory, vimv will use `git mv` (instead of `mv`) to rename the files.
 
