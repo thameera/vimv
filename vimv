@@ -4,7 +4,7 @@
 # USAGE: vimv
 # https://github.com/thameera/vimv
 
-IFS=$'\r\n' GLOBIGNORE='*' command eval  'src=($(ls *))'
+IFS=$'\r\n' GLOBIGNORE='*' command eval  'src=($(ls))'
 
 touch /tmp/vimv.$$
 for ((i=0;i<${#src[@]};++i)); do
