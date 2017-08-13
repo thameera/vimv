@@ -14,6 +14,10 @@ curl https://raw.githubusercontent.com/thameera/vimv/master/vimv > ~/bin/vimv &&
 2. Use Vim's text editing features to edit the names of files. For example, search and replace a particular string.
 3. Save and exit. Your files should be renamed now.
 
+## Screencast
+
+![alt text](screencast.gif "vimv in action")
+
 ## Gotchas
 
 Don't delete or swap the lines while in Vim or things will get ugly.
