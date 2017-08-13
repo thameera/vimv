@@ -4,21 +4,21 @@
 # USAGE: vimv
 # https://github.com/thameera/vimv
 
-IFS=$'\r\n' GLOBIGNORE='*' command eval  'arr1=($(ls *))'
+IFS=$'\r\n' GLOBIGNORE='*' command eval  'src=($(ls *))'
 
 touch /tmp/vimv.$$
-for ((i=0;i<${#arr1[@]};++i)); do
-    echo "${arr1[i]}" >> /tmp/vimv.$$
+for ((i=0;i<${#src[@]};++i)); do
+    echo "${src[i]}" >> /tmp/vimv.$$
 done
 
 vi /tmp/vimv.$$
 
-IFS=$'\r\n' GLOBIGNORE='*' command eval  'arr2=($(cat /tmp/vimv.$$))'
+IFS=$'\r\n' GLOBIGNORE='*' command eval  'dest=($(cat /tmp/vimv.$$))'
 
 count=0
-for ((i=0;i<${#arr1[@]};++i)); do
-    if [ "${arr1[i]}" != "${arr2[i]}" ]; then
-        mv "${arr1[i]}" "${arr2[i]}"
+for ((i=0;i<${#src[@]};++i)); do
+    if [ "${src[i]}" != "${dest[i]}" ]; then
+        mv "${src[i]}" "${dest[i]}"
         ((count++))
     fi
 done
