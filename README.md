@@ -8,6 +8,8 @@ vimv is a terminal-based file rename utility that lets you easily mass-rename fi
 curl https://raw.githubusercontent.com/thameera/vimv/master/vimv > ~/bin/vimv && chmod +755 ~/bin/vimv
 ```
 
+Or simply copy the `vimv` file to a location in your `$PATH` and make it executable.
+
 ## Usage
 
 1. Go to a directory and enter `vimv`. A Vim window will be opened with names of all files.
