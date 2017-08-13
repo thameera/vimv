@@ -16,6 +16,11 @@ Or simply copy the `vimv` file to a location in your `$PATH` and make it executa
 2. Use Vim's text editing features to edit the names of files. For example, search and replace a particular string, or use visual selection to delete a block.
 3. Save and exit. Your files should be renamed now.
 
+## Other features
+
+* If you have an `$EDITOR` environment variable set, vimv will use its value by default.
+* If you are inside a Git directory, vimv will use `git mv` (instead of `mv`) to rename the files.
+
 ## Screencast
 
 ![alt text](screencast.gif "vimv in action")
