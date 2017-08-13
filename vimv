@@ -6,19 +6,25 @@
 
 IFS=$'\r\n' GLOBIGNORE='*' command eval  'src=($(ls))'
 
+if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+    MOVE_CMD='git mv'
+else
+    MOVE_CMD='mv'
+fi
+
 touch /tmp/vimv.$$
 for ((i=0;i<${#src[@]};++i)); do
     echo "${src[i]}" >> /tmp/vimv.$$
 done
 
-vi /tmp/vimv.$$
+$EDITOR /tmp/vimv.$$
 
 IFS=$'\r\n' GLOBIGNORE='*' command eval  'dest=($(cat /tmp/vimv.$$))'
 
 count=0
 for ((i=0;i<${#src[@]};++i)); do
     if [ "${src[i]}" != "${dest[i]}" ]; then
-        mv "${src[i]}" "${dest[i]}"
+        $MOVE_CMD "${src[i]}" "${dest[i]}"
         ((count++))
     fi
 done
