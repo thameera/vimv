@@ -4,20 +4,22 @@
 # USAGE: vimv [file1 file2]
 # https://github.com/thameera/vimv
 
+TMPDIR=${TMPDIR:-'/tmp'} 
+
 if [ $# -ne 0 ]; then
     src=( "$@" )
 else
     IFS=$'\r\n' GLOBIGNORE='*' command eval  'src=($(ls))'
 fi
 
-touch /tmp/vimv.$$
+touch $TMPDIR/vimv.$$
 for ((i=0;i<${#src[@]};++i)); do
-    echo "${src[i]}" >> /tmp/vimv.$$
+    echo "${src[i]}" >> $TMPDIR/vimv.$$
 done
 
-${EDITOR:-vi} /tmp/vimv.$$
+${EDITOR:-vi} $TMPDIR/vimv.$$
 
-IFS=$'\r\n' GLOBIGNORE='*' command eval  'dest=($(cat /tmp/vimv.$$))'
+IFS=$'\r\n' GLOBIGNORE='*' command eval  'dest=($(cat $TMPDIR/vimv.$$))'
 
 count=0
 for ((i=0;i<${#src[@]};++i)); do
@@ -34,4 +36,4 @@ done
 
 echo "$count" files renamed.
 
-rm /tmp/vimv.$$
+rm $TMPDIR/vimv.$$
