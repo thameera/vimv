@@ -21,18 +21,27 @@ done
 ${EDITOR:-vi} "${FILENAMES_FILE}"
 
 IFS=$'\r\n' GLOBIGNORE='*' command eval  'dest=($(cat "${FILENAMES_FILE}"))'
-
-count=0
+renamed=0
+deleted=0
 for ((i=0;i<${#src[@]};++i)); do
     if [ "${src[i]}" != "${dest[i]}" ]; then
         mkdir -p "`dirname "${dest[i]}"`"
         if git ls-files --error-unmatch "${src[i]}" > /dev/null 2>&1; then
             git mv "${src[i]}" "${dest[i]}"
+            ((renamed++))
+        elif [ "del" = "${dest[i]}" ]; then # in vim replace the file name with 'del' to delete the file/dir
+            if [ ! -z $VIMV_USE_RMTRASH ]; then # export VIMV_USE_RMTRASH=1 to use rmtrash
+              rmtrash -rf "${src[i]}"
+            else
+              rm -rf "${src[i]}" 
+            fi
+            ((deleted++))
         else
             mv "${src[i]}" "${dest[i]}"
+            ((renamed++))
         fi
-        ((count++))
     fi
 done
 
-echo "$count" files renamed.
+echo "$renamed" files renamed.
+echo "$deleted" files deleted.
