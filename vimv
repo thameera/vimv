@@ -27,10 +27,15 @@ for ((i=0;i<${#src[@]};++i)); do
     if [ "${src[i]}" != "${dest[i]}" ]; then
         mkdir -p "`dirname "${dest[i]}"`"
         if git ls-files --error-unmatch "${src[i]}" > /dev/null 2>&1; then
+          if [ "del" = "${dest[i]}" ]; then
+            git rm "${src[i]}"
+            ((deleted++))
+          else
             git mv "${src[i]}" "${dest[i]}"
             ((renamed++))
-        elif [ "del" = "${dest[i]}" ]; then # in vim replace the file name with 'del' to delete the file/dir
-            if [ ! -z $VIMV_USE_RMTRASH ]; then # export VIMV_USE_RMTRASH=1 to use rmtrash
+          fi
+        elif [ "del" = "${dest[i]}" ]; then
+            if [ ! -z $VIMV_USE_RMTRASH ]; then
               rmtrash -rf "${src[i]}"
             else
               rm -rf "${src[i]}" 
