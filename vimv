@@ -4,6 +4,8 @@
 # USAGE: vimv [file1 file2]
 # https://github.com/thameera/vimv
 
+which git > /dev/null 2>&1 || (echo "Install git first before running this command" && exit 1)
+
 declare -r FILENAMES_FILE="$(mktemp --tmpdir vimv.XXX)"
 
 trap '{ rm -f "${FILENAMES_FILE}" ; }' EXIT
