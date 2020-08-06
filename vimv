@@ -39,7 +39,7 @@ for ((i=0;i<${#src[@]};++i)); do
       fi
 
     elif [[ "${dest[i]}" =~ ${VIMV_DEL:-^del$} ]]; then
-      eval "${VIMV_RM:-rm -rf}" "${src[i]}" 
+      eval "${VIMV_RM:-rm -rf}" \""${src[i]}"\"
       ((removed++))
     else
       mv "${src[i]}" "${dest[i]}"
