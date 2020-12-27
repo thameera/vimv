@@ -4,9 +4,14 @@ vimv is a terminal-based file rename utility that lets you easily mass-rename fi
 
 ## Installing
 
-```
-curl https://raw.githubusercontent.com/thameera/vimv/master/vimv > ~/bin/vimv && chmod +755 ~/bin/vimv
-```
+1. For the current user:
+   ```
+   curl https://raw.githubusercontent.com/thameera/vimv/master/vimv > ~/bin/vimv && chmod +755 ~/bin/vimv
+   ```
+2. For the current system:
+   ```
+   sudo PREFIX=/usr make install
+   ```
 
 Or simply copy the `vimv` file to a location in your `$PATH` and make it executable.
 
