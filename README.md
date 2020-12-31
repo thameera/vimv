@@ -10,7 +10,7 @@ vimv is a terminal-based file rename utility that lets you easily mass-rename fi
    ```
 2. For the current system:
    ```
-   sudo PREFIX=/usr make install
+   sudo PREFIX=/usr/local make install
    ```
 
 Or simply copy the `vimv` file to a location in your `$PATH` and make it executable.
