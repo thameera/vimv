@@ -32,7 +32,7 @@ for ((i=0;i<${#src[@]};++i)); do
         else
             mv "${src[i]}" "${dest[i]}"
         fi
-        ((count++))
+        ((++count))
     fi
 done
 
