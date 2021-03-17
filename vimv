@@ -28,9 +28,9 @@ for ((i=0;i<${#src[@]};++i)); do
     if [ "${src[i]}" != "${dest[i]}" ]; then
         mkdir -p "`dirname "${dest[i]}"`"
         if git ls-files --error-unmatch "${src[i]}" > /dev/null 2>&1; then
-            git mv "${src[i]}" "${dest[i]}"
+            git mv -- "${src[i]}" "${dest[i]}"
         else
-            mv "${src[i]}" "${dest[i]}"
+            mv -- "${src[i]}" "${dest[i]}"
         fi
         ((++count))
     fi
