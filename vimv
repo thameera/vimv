@@ -2,8 +2,18 @@
 set -eu
 
 # Lists the current directory's files in Vim, so you can edit it and save to rename them
-# USAGE: vimv [file1 file2]
+# USAGE: vimv [option] [file1 file2]
 # https://github.com/thameera/vimv
+
+verbose=0
+while getopts "v" opt
+do
+    case $opt in
+    (v) verbose=1 ;;
+    (*) printf "Illegal option '-%s'\n" "$opt" && exit 1 ;;
+    esac
+done
+shift $((OPTIND - 1))
 
 declare -r FILENAMES_FILE=$(mktemp "${TMPDIR:-/tmp}/vimv.XXX")
 
@@ -37,6 +47,7 @@ for ((i=0;i<${#src[@]};++i)); do
         else
             mv "${src[i]}" "${dest[i]}"
         fi
+        (( verbose )) && echo "${src[i]} -> ${dest[i]}"
         ((++count))
     fi
 done
