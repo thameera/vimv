@@ -6,7 +6,7 @@ vimv is a terminal-based file rename utility that lets you easily mass-rename fi
 
 1. For the current user:
    ```
-   curl https://raw.githubusercontent.com/thameera/vimv/master/vimv > ~/bin/vimv && chmod +755 ~/bin/vimv
+   curl https://raw.githubusercontent.com/thameera/vimv/master/vimv > ~/.local/bin/vimv && chmod +755 ~/.local/bin/vimv
    ```
 2. For the current system:
    ```
