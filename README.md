@@ -36,3 +36,6 @@ Or simply copy the `vimv` file to a location in your `$PATH` and make it executa
 ## Gotchas
 
 Don't delete or swap the lines while in Vim or things will get ugly.
+
+## See also
+ - vidir(1) from [moreutils](https://joeyh.name/code/moreutils/)
