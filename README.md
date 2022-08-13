@@ -1,15 +1,17 @@
 # vimv
 
-vimv is a terminal-based file rename utility that lets you easily mass-rename files using Vim.
+vimv is a terminal-based file rename utility that lets you easily bulk-rename files using Vim (or `$EDITOR`).
 
 ## Installing
 
 1. For the current user:
    ```
-   curl https://raw.githubusercontent.com/thameera/vimv/master/vimv > ~/bin/vimv && chmod +755 ~/bin/vimv
+   curl -s https://raw.githubusercontent.com/thameera/vimv/master/vimv > ~/bin/vimv && chmod 755 ~/bin/vimv
    ```
 2. For the current system:
    ```
+   sudo curl -s https://raw.githubusercontent.com/thameera/vimv/master/vimv > /usr/local/bin/vimv && sudo chmod 755 /usr/local/bin/vimv
+   # OR #
    sudo PREFIX=/usr/local make install
    ```
 
@@ -17,22 +19,19 @@ Or simply copy the `vimv` file to a location in your `$PATH` and make it executa
 
 ## Usage
 
-1. Go to a directory and enter `vimv` with optionally, a list of files to rename.
-2. A Vim window will be opened with names of all files.
-3. Use Vim's text editing features to edit the names of files. For example, search and replace a particular string, or use visual selection to delete a block.
-4. Save and exit. Your files should be renamed now.
+1. Run `vimv` in a directory, its files will be presented in your editor.
+2. Edit as desired.  e.g. search and replace a particular string.
+3. Save and exit to rename your files.
+
+Important: Do NOT delete or swap the lines while editing or unexpected things will occur.
 
 ## Other features
 
-* If you want to list only a group of files, you can pass them as an argument. eg: `vimv *.mp4`
-* If you have an `$EDITOR` environment variable set, vimv will use its value by default.
-* If you are inside a Git directory, vimv will use `git mv` (instead of `mv`) to rename the files.
-* You can use `/some/path/filename` format to move the file elsewhere during renaming. If the path is non-existent, it will be automatically created before moving.
+* To list only a group of files, you can pass them as an argument. eg: `vimv *.mp4`
+* `vimv` uses the `$EDITOR` environment variable by default.
+* Within a Git directory, vimv will use `git mv` (instead of `mv`) to rename the files.
+* You can use `/some/path/filename` format to move a file elsewhere during renaming, automatically creating new directories before moving.
 
 ## Screencast
 
 ![alt text](screencast.gif "vimv in action")
-
-## Gotchas
-
-Don't delete or swap the lines while in Vim or things will get ugly.
