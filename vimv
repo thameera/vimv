@@ -5,7 +5,7 @@ set -eu
 # USAGE: vimv [file1 file2]
 # https://github.com/thameera/vimv
 
-declare -r FILENAMES_FILE=$(mktemp "${TMPDIR:-/tmp}/vimv.XXX")
+declare -r FILENAMES_FILE=$(mktemp "${TMPDIR:-/tmp}/vimv.XXXXXX")
 
 trap '{ rm -f "${FILENAMES_FILE}" ; }' EXIT
 
