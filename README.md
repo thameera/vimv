@@ -36,3 +36,12 @@ Or simply copy the `vimv` file to a location in your `$PATH` and make it executa
 ## Gotchas
 
 Don't delete or swap the lines while in Vim or things will get ugly.
+
+## Running tests
+
+Tests are written using [bats](https://github.com/bats-core/bats-core). To run the tests:
+
+```sh
+git submodule update --init
+test/test_vimv.bats
+```
