@@ -42,3 +42,27 @@ EOF
   # Test that the output is correct
   assert_output "2 files renamed."
 }
+
+@test "Argument handling" {
+  touch file1.mp4 file2.mp4 file3.txt
+
+  MOCK_EDITOR=$(cat <<EOF
+#!/usr/bin/env bash
+sed -i '' -e 's/^/renamed_/g' \$1
+EOF
+)
+
+  echo "$MOCK_EDITOR" > mock_editor
+  chmod +x mock_editor
+
+  run env EDITOR="mock_editor" vimv *.mp4
+
+  # Test that the files were renamed
+  [ -e renamed_file1.mp4 ] && [ -e renamed_file2.mp4 ]
+  [ ! -e file1.mp4 ] && [ ! -e file2.mp4 ]
+
+  # The txt file should be untouched
+  [ -e file3.txt ]
+
+  assert_output "2 files renamed."
+}
