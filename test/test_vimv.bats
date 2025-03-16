@@ -66,3 +66,25 @@ EOF
 
   assert_output "2 files renamed."
 }
+
+@test "Directory creation with renamed files" {
+  touch file1 file2
+
+  MOCK_EDITOR=$(cat <<EOF
+#!/usr/bin/env bash
+sed -i '' -e 's/file1/dir1\/renamed_file1/g' -e 's/file2/dir2\/subdir\/renamed_file2/g' \$1
+EOF
+)
+
+  echo "$MOCK_EDITOR" > mock_editor
+  chmod +x mock_editor
+
+  run env EDITOR="mock_editor" vimv
+
+  # Test that directories were created and files were properly renamed
+  [ -e dir1/renamed_file1 ]
+  [ -e dir2/subdir/renamed_file2 ]
+  [ ! -e file1 ] && [ ! -e file2 ]
+
+  assert_output "2 files renamed."
+}
