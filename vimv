@@ -29,16 +29,29 @@ if (( ${#src[@]} != ${#dest[@]} )); then
 fi
 
 declare -i count=0
+EXT=".vimv-tmp-$(date +%s)-${RANDOM}"
 for ((i=0;i<${#src[@]};++i)); do
     if [ "${src[i]}" != "${dest[i]}" ]; then
         mkdir -p "$(dirname "${dest[i]}")"
         if git ls-files --error-unmatch "${src[i]}" > /dev/null 2>&1; then
-            git mv -- "${src[i]}" "${dest[i]}"
+            git mv -- "${src[i]}" "${dest[i]}.${EXT}"
         else
-            mv -- "${src[i]}" "${dest[i]}"
+            mv -- "${src[i]}" "${dest[i]}.${EXT}"
         fi
         ((++count))
     fi
 done
+
+for ((i=0;i<${#src[@]};++i)); do
+    if [ "${src[i]}" != "${dest[i]}" ]; then
+        if git ls-files --error-unmatch "${dest[i]}.${EXT}" > /dev/null 2>&1; then
+            git mv -- "${dest[i]}.${EXT}" "${dest[i]}"
+        else
+            mv -- "${dest[i]}.${EXT}" "${dest[i]}"
+        fi
+    fi
+done
+
+
 
 echo "$count" files renamed.
