@@ -123,3 +123,26 @@ EOF
   run bash -c "git ls-files | grep -q renamed_untracked_file"
   [ "$status" -ne 0 ]
 }
+
+@test "Abort on duplicate destination filenames" {
+  touch file1 file2
+
+  MOCK_EDITOR=$(cat <<EOF
+#!/usr/bin/env bash
+# Rename both files to the same name → duplicates
+sed -i '' -e 's/file1/dup/g' -e 's/file2/dup/g' \$1
+EOF
+)
+  echo "$MOCK_EDITOR" > mock_editor
+  chmod +x mock_editor
+
+  run env EDITOR="mock_editor" vimv
+
+  # Should fail
+  [ "$status" -ne 0 ]
+  assert_output --partial "Destination filenames are not unique"
+
+  # Nothing was renamed
+  [ -e file1 ] && [ -e file2 ]
+  [ ! -e dup ]
+}
