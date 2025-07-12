@@ -28,14 +28,11 @@ Or simply copy the `vimv` file to a location in your `$PATH` and make it executa
 * If you have an `$EDITOR` environment variable set, vimv will use its value by default.
 * If you are inside a Git directory, vimv will use `git mv` (instead of `mv`) to rename the files.
 * You can use `/some/path/filename` format to move the file elsewhere during renaming. If the path is non-existent, it will be automatically created before moving.
+* Cyclic renames are supported (file1 <-> file2)
 
 ## Screencast
 
 ![alt text](screencast.gif "vimv in action")
-
-## Gotchas
-
-Don't delete or swap the lines while in Vim or things will get ugly.
 
 ## Running tests
 
