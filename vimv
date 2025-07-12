@@ -9,6 +9,21 @@ declare -r FILENAMES_FILE=$(mktemp "${TMPDIR:-/tmp}/vimv.XXXXXX")
 
 trap '{ rm -f "${FILENAMES_FILE}" ; }' EXIT
 
+safeMove() {
+    local src="$1"
+    local dest="$2"
+    mkdir -p "$(dirname "$dest")"
+    if [ -e "$dest" ]; then
+        echo "WARN: Can't rename '$src' -> '$dest', destination exists!" >&2
+        return 1
+    fi
+    if git ls-files --error-unmatch "$src" > /dev/null 2>&1; then
+        git mv -- "$src" "$dest"
+    else
+        mv -n -- "$src" "$dest"
+    fi
+}
+
 if [ $# -ne 0 ]; then
     src=( "$@" )
 else
@@ -35,26 +50,16 @@ if (( ${#dest[@]} != ${#dest_unique[@]} )); then
 fi
 
 declare -i count=0
-EXT=".vimv-tmp-$(date +%s)-${RANDOM}"
+EXT="vimv-tmp-$(date +%s)-${RANDOM}"
 for ((i=0;i<${#src[@]};++i)); do
     if [ "${src[i]}" != "${dest[i]}" ]; then
-        mkdir -p "$(dirname "${dest[i]}")"
-        if git ls-files --error-unmatch "${src[i]}" > /dev/null 2>&1; then
-            git mv -- "${src[i]}" "${dest[i]}.${EXT}"
-        else
-            mv -- "${src[i]}" "${dest[i]}.${EXT}"
-        fi
-        ((++count))
+        safeMove "${src[i]}" "${dest[i]}.${EXT}" && ((++count))
     fi
 done
 
 for ((i=0;i<${#src[@]};++i)); do
     if [ "${src[i]}" != "${dest[i]}" ]; then
-        if git ls-files --error-unmatch "${dest[i]}.${EXT}" > /dev/null 2>&1; then
-            git mv -- "${dest[i]}.${EXT}" "${dest[i]}"
-        else
-            mv -- "${dest[i]}.${EXT}" "${dest[i]}"
-        fi
+        safeMove "${dest[i]}.${EXT}" "${dest[i]}" || : resume on error
     fi
 done
 
