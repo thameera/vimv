@@ -22,23 +22,42 @@ done
 ${EDITOR:-vi} "${FILENAMES_FILE}"
 
 IFS=$'\r\n' GLOBIGNORE='*' command eval 'dest=($(cat "${FILENAMES_FILE}"))'
+IFS=$'\r\n' GLOBIGNORE='*' command eval 'dest_unique=($(cat "${FILENAMES_FILE}" | sort -u))'
 
 if (( ${#src[@]} != ${#dest[@]} )); then
     echo "WARN: Number of files changed. Did you delete a line by accident? Aborting.." >&2
     exit 1
 fi
 
+if (( ${#dest[@]} != ${#dest_unique[@]} )); then
+    echo "WARN: Destination filenames are not unique! Aborting.." >&2
+    exit 1
+fi
+
 declare -i count=0
+EXT=".vimv-tmp-$(date +%s)-${RANDOM}"
 for ((i=0;i<${#src[@]};++i)); do
     if [ "${src[i]}" != "${dest[i]}" ]; then
         mkdir -p "$(dirname "${dest[i]}")"
         if git ls-files --error-unmatch "${src[i]}" > /dev/null 2>&1; then
-            git mv -- "${src[i]}" "${dest[i]}"
+            git mv -- "${src[i]}" "${dest[i]}.${EXT}"
         else
-            mv -- "${src[i]}" "${dest[i]}"
+            mv -- "${src[i]}" "${dest[i]}.${EXT}"
         fi
         ((++count))
     fi
 done
+
+for ((i=0;i<${#src[@]};++i)); do
+    if [ "${src[i]}" != "${dest[i]}" ]; then
+        if git ls-files --error-unmatch "${dest[i]}.${EXT}" > /dev/null 2>&1; then
+            git mv -- "${dest[i]}.${EXT}" "${dest[i]}"
+        else
+            mv -- "${dest[i]}.${EXT}" "${dest[i]}"
+        fi
+    fi
+done
+
+
 
 echo "$count" files renamed.
