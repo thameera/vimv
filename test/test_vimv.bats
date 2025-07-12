@@ -146,3 +146,35 @@ EOF
   [ -e file1 ] && [ -e file2 ]
   [ ! -e dup ]
 }
+
+@test "Cyclic renaming (file1 <-> file2)" {
+  # Two files with distinguishable content
+  echo "one" > file1
+  echo "two" > file2
+
+  # Swap the two names in-place
+  MOCK_EDITOR=$(cat <<'EOF'
+#!/usr/bin/env bash
+# Swap file1 ↔︎ file2 using a temporary placeholder
+sed -i '' \
+  -e 's/file1/__tmp__/g' \
+  -e 's/file2/file1/g' \
+  -e 's/__tmp__/file2/g' "$1"
+EOF
+)
+  echo "$MOCK_EDITOR" > mock_editor
+  chmod +x mock_editor
+
+  run env EDITOR="mock_editor" vimv
+  assert_success
+  assert_output "2 files renamed."
+
+  # Both files should still exist
+  [ -e file1 ] && [ -e file2 ]
+
+  # and their contents should have swapped
+  run cat file1
+  assert_output "two"
+  run cat file2
+  assert_output "one"
+}
