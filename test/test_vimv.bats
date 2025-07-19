@@ -178,3 +178,106 @@ EOF
   run cat file2
   assert_output "one"
 }
+
+@test "No overwrite into existing path (non-git)" {
+  echo src > myfile
+  mkdir t
+  echo keep > t/keepme
+
+  # Rename myfile -> t/keepme (already exists)
+  MOCK_EDITOR=$(cat <<'EOF'
+#!/usr/bin/env bash
+sed -i '' -e 's@myfile@t/keepme@g' "$1"
+EOF
+)
+  echo "$MOCK_EDITOR" > mock_editor
+  chmod +x mock_editor
+
+  run env EDITOR="mock_editor" vimv myfile
+  assert_success
+  assert_output --partial "1 files renamed."
+  assert_output --partial "WARN: Can't rename 't/keepme.vimv-tmp" || true # warning printed in second pass
+
+  # Original dest intact
+  [ "$(cat t/keepme)" = "keep" ]
+
+  # Parked temp exists
+  ls t/keepme.vimv-tmp-* >/dev/null 2>&1
+  [ "$status" -eq 0 ]
+
+  # Source gone
+  [ ! -e myfile ]
+}
+
+@test "No overwrite into existing path (git-tracked)" {
+  git init .
+  git config --local user.email "test@example.com"
+  git config --local user.name "Test User"
+
+  echo src > myfile
+  mkdir t
+  echo keep > t/keepme
+
+  git add myfile t/keepme
+  git commit -m "add files"
+
+  # Rename myfile -> t/keepme (already exists)
+  MOCK_EDITOR=$(cat <<'EOF'
+#!/usr/bin/env bash
+sed -i '' -e 's@myfile@t/keepme@g' "$1"
+EOF
+)
+  echo "$MOCK_EDITOR" > mock_editor
+  chmod +x mock_editor
+
+  run env EDITOR="mock_editor" vimv myfile
+  assert_success
+  assert_output --partial "1 files renamed."
+  assert_output --partial "WARN: Can't rename"  # should have warned
+
+  # Existing tracked file still present & unchanged
+  [ -e t/keepme ]
+  [ "$(cat t/keepme)" = "keep" ]
+
+  # Parked git-tracked temp exists
+  ls t/keepme.vimv-tmp-* >/dev/null 2>&1
+  [ "$status" -eq 0 ]
+
+  # Check git knows about the parked name (grep for pattern)
+  run bash -c 'git ls-files | grep -E "t/keepme\.vimv-tmp-"'
+  assert_success
+}
+
+@test "Mixed batch: conflict + clean rename continues" {
+  echo a > file_conflict
+  echo b > file_ok
+  mkdir t
+  echo keep > t/keepme
+
+  # Rename conflict file -> t/keepme (exists)
+  # Rename ok file -> file_ok_new
+  MOCK_EDITOR=$(cat <<'EOF'
+#!/usr/bin/env bash
+# Replace file_conflict first, file_ok second
+sed -i '' \
+  -e 's@file_conflict@t/keepme@g' \
+  -e 's@file_ok@file_ok_new@g' "$1"
+EOF
+)
+  echo "$MOCK_EDITOR" > mock_editor
+  chmod +x mock_editor
+
+  run env EDITOR="mock_editor" vimv file_conflict file_ok
+  assert_success
+  assert_output --partial "2 files renamed."
+  assert_output --partial "WARN: Can't rename"  # at least one warning expected
+
+  # Clean rename succeeded
+  [ -e file_ok_new ]
+  [ ! -e file_ok ]
+
+  # Conflict handled: dest untouched, parked temp exists
+  [ "$(cat t/keepme)" = "keep" ]
+  ls t/keepme.vimv-tmp-* >/dev/null 2>&1
+  [ "$status" -eq 0 ]
+}
