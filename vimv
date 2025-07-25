@@ -27,7 +27,7 @@ safeMove() {
 if [ $# -ne 0 ]; then
     src=( "$@" )
 else
-    IFS=$'\r\n' GLOBIGNORE='*' command eval 'src=($(ls))'
+    IFS=$'\r\n' GLOBIGNORE='*' command eval 'src=($(ls -1A))'
 fi
 
 for ((i=0;i<${#src[@]};++i)); do
@@ -62,7 +62,5 @@ for ((i=0;i<${#src[@]};++i)); do
         safeMove "${dest[i]}.${EXT}" "${dest[i]}" || : resume on error
     fi
 done
-
-
 
 echo "$count" files renamed.

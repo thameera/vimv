@@ -281,3 +281,27 @@ EOF
   ls t/keepme.vimv-tmp-* >/dev/null 2>&1
   [ "$status" -eq 0 ]
 }
+
+@test "Dotfile renaming" {
+  # Create hidden files
+  touch .file1 .file2
+
+  # Mock EDITOR that renames dotfiles
+  MOCK_EDITOR=$(cat <<EOF
+#!/usr/bin/env bash
+sed -i '' -e 's/\\.file1/renamed_file1/g' -e 's/\\.file2/renamed_file2/g' \$1
+EOF
+)
+  echo "$MOCK_EDITOR" > mock_editor
+  chmod +x mock_editor
+
+  # Run vimv explicitly on the dotfiles
+  run env EDITOR="mock_editor" vimv
+
+  # Files should be renamed
+  [ -e renamed_file1 ] && [ -e renamed_file2 ]
+  [ ! -e .file1 ] && [ ! -e .file2 ]
+
+  # Output should confirm the count
+  assert_output "2 files renamed."
+}
