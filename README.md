@@ -40,5 +40,5 @@ Tests are written using [bats](https://github.com/bats-core/bats-core). To run t
 
 ```sh
 git submodule update --init
-test/test_vimv.bats
+./test/bats/bin/bats test/test_vimv.bats
 ```
