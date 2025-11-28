@@ -14,6 +14,15 @@ setup() {
   cd "$TMPDIR"
 
   PATH="$DIR/..:$TMPDIR:$PATH"
+
+  # Portable sed -i flag (GNU vs BSD)
+  if sed --version >/dev/null 2>&1; then
+    # GNU sed
+    export SED_INPLACE='-i'
+  else
+    # BSD/macOS sed
+    export SED_INPLACE="-i ''"
+  fi
 }
 
 teardown() {
@@ -24,9 +33,9 @@ teardown() {
   touch file1 file2
 
   # A mock EDITOR that renames file1 to renamed_file1 and file2 to renamed_file2
-  MOCK_EDITOR=$(cat <<EOF
+  MOCK_EDITOR=$(cat <<'EOF'
 #!/usr/bin/env bash
-sed -i '' -e 's/file1/renamed_file1/g' -e 's/file2/renamed_file2/g' \$1
+sed $SED_INPLACE -e 's/file1/renamed_file1/g' -e 's/file2/renamed_file2/g' "$1"
 EOF
 )
 
@@ -46,9 +55,9 @@ EOF
 @test "Argument handling" {
   touch file1.mp4 file2.mp4 file3.txt
 
-  MOCK_EDITOR=$(cat <<EOF
+  MOCK_EDITOR=$(cat <<'EOF'
 #!/usr/bin/env bash
-sed -i '' -e 's/^/renamed_/g' \$1
+sed $SED_INPLACE -e 's/^/renamed_/g' "$1"
 EOF
 )
 
@@ -70,9 +79,9 @@ EOF
 @test "Directory creation with renamed files" {
   touch file1 file2
 
-  MOCK_EDITOR=$(cat <<EOF
+  MOCK_EDITOR=$(cat <<'EOF'
 #!/usr/bin/env bash
-sed -i '' -e 's/file1/dir1\/renamed_file1/g' -e 's/file2/dir2\/subdir\/renamed_file2/g' \$1
+sed $SED_INPLACE -e 's/file1/dir1\/renamed_file1/g' -e 's/file2/dir2\/subdir\/renamed_file2/g' "$1"
 EOF
 )
 
@@ -97,10 +106,10 @@ EOF
   git config --local user.email "test@example.com"
   git config --local user.name "Test User"
   git commit -m "Initial commit"
-  
-  MOCK_EDITOR=$(cat <<EOF
+
+  MOCK_EDITOR=$(cat <<'EOF'
 #!/usr/bin/env bash
-sed -i '' -e 's/git_tracked_file1/renamed_git_file1/g' -e 's/git_tracked_file2/renamed_git_file2/g' -e 's/untracked_file/renamed_untracked_file/g' \$1
+sed $SED_INPLACE -e 's/git_tracked_file1/renamed_git_file1/g' -e 's/git_tracked_file2/renamed_git_file2/g' -e 's/untracked_file/renamed_untracked_file/g' "$1"
 EOF
 )
 
@@ -109,16 +118,16 @@ EOF
 
   run env EDITOR="mock_editor" vimv
   assert_output "3 files renamed."
-  
+
   # Test that files were renamed
   [ -e renamed_git_file1 ] && [ -e renamed_git_file2 ] && [ -e renamed_untracked_file ]
   [ ! -e git_tracked_file1 ] && [ ! -e git_tracked_file2 ] && [ ! -e untracked_file ]
-  
+
   # Verify git-tracked files were renamed with git mv by checking git status
   run git ls-files
   assert_line "renamed_git_file1"
   assert_line "renamed_git_file2"
-  
+
   # Ensure the untracked file is still not tracked
   run bash -c "git ls-files | grep -q renamed_untracked_file"
   [ "$status" -ne 0 ]
@@ -127,10 +136,10 @@ EOF
 @test "Abort on duplicate destination filenames" {
   touch file1 file2
 
-  MOCK_EDITOR=$(cat <<EOF
+  MOCK_EDITOR=$(cat <<'EOF'
 #!/usr/bin/env bash
 # Rename both files to the same name → duplicates
-sed -i '' -e 's/file1/dup/g' -e 's/file2/dup/g' \$1
+sed $SED_INPLACE -e 's/file1/dup/g' -e 's/file2/dup/g' "$1"
 EOF
 )
   echo "$MOCK_EDITOR" > mock_editor
@@ -156,7 +165,7 @@ EOF
   MOCK_EDITOR=$(cat <<'EOF'
 #!/usr/bin/env bash
 # Swap file1 ↔︎ file2 using a temporary placeholder
-sed -i '' \
+sed $SED_INPLACE \
   -e 's/file1/__tmp__/g' \
   -e 's/file2/file1/g' \
   -e 's/__tmp__/file2/g' "$1"
@@ -187,7 +196,7 @@ EOF
   # Rename myfile -> t/keepme (already exists)
   MOCK_EDITOR=$(cat <<'EOF'
 #!/usr/bin/env bash
-sed -i '' -e 's@myfile@t/keepme@g' "$1"
+sed $SED_INPLACE -e 's@myfile@t/keepme@g' "$1"
 EOF
 )
   echo "$MOCK_EDITOR" > mock_editor
@@ -224,7 +233,7 @@ EOF
   # Rename myfile -> t/keepme (already exists)
   MOCK_EDITOR=$(cat <<'EOF'
 #!/usr/bin/env bash
-sed -i '' -e 's@myfile@t/keepme@g' "$1"
+sed $SED_INPLACE -e 's@myfile@t/keepme@g' "$1"
 EOF
 )
   echo "$MOCK_EDITOR" > mock_editor
@@ -259,7 +268,7 @@ EOF
   MOCK_EDITOR=$(cat <<'EOF'
 #!/usr/bin/env bash
 # Replace file_conflict first, file_ok second
-sed -i '' \
+sed $SED_INPLACE \
   -e 's@file_conflict@t/keepme@g' \
   -e 's@file_ok@file_ok_new@g' "$1"
 EOF
@@ -287,9 +296,9 @@ EOF
   touch .file1 .file2
 
   # Mock EDITOR that renames dotfiles
-  MOCK_EDITOR=$(cat <<EOF
+  MOCK_EDITOR=$(cat <<'EOF'
 #!/usr/bin/env bash
-sed -i '' -e 's/\\.file1/renamed_file1/g' -e 's/\\.file2/renamed_file2/g' \$1
+sed $SED_INPLACE -e 's/\.file1/renamed_file1/g' -e 's/\.file2/renamed_file2/g' "$1"
 EOF
 )
   echo "$MOCK_EDITOR" > mock_editor
