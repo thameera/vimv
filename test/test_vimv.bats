@@ -211,8 +211,8 @@ EOF
   [ "$(cat t/keepme)" = "keep" ]
 
   # Parked temp exists
-  ls t/keepme.vimv-tmp-* >/dev/null 2>&1
-  [ "$status" -eq 0 ]
+  run ls t/keepme.vimv-tmp-*
+  assert_success
 
   # Source gone
   [ ! -e myfile ]
@@ -249,8 +249,8 @@ EOF
   [ "$(cat t/keepme)" = "keep" ]
 
   # Parked git-tracked temp exists
-  ls t/keepme.vimv-tmp-* >/dev/null 2>&1
-  [ "$status" -eq 0 ]
+  run ls t/keepme.vimv-tmp-*
+  assert_success
 
   # Check git knows about the parked name (grep for pattern)
   run bash -c 'git ls-files | grep -E "t/keepme\.vimv-tmp-"'
@@ -287,8 +287,8 @@ EOF
 
   # Conflict handled: dest untouched, parked temp exists
   [ "$(cat t/keepme)" = "keep" ]
-  ls t/keepme.vimv-tmp-* >/dev/null 2>&1
-  [ "$status" -eq 0 ]
+  run ls t/keepme.vimv-tmp-*
+  assert_success
 }
 
 @test "Dotfile renaming" {
