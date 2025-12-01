@@ -314,3 +314,26 @@ EOF
   # Output should confirm the count
   assert_output "2 files renamed."
 }
+
+@test "Abort on line count mismatch (deleted line)" {
+  touch file1 file2 file3
+
+  # Mock editor that deletes one line
+  MOCK_EDITOR=$(cat <<'EOF'
+#!/usr/bin/env bash
+# Delete the second line, leaving only 2 lines instead of 3
+sed $SED_INPLACE -e '2d' "$1"
+EOF
+)
+  echo "$MOCK_EDITOR" > mock_editor
+  chmod +x mock_editor
+
+  run env EDITOR="mock_editor" vimv
+
+  # Should fail
+  [ "$status" -ne 0 ]
+  assert_output --partial "Number of files changed"
+
+  # Nothing was renamed - all original files still exist
+  [ -e file1 ] && [ -e file2 ] && [ -e file3 ]
+}
