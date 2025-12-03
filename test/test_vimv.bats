@@ -304,7 +304,7 @@ EOF
   echo "$MOCK_EDITOR" > mock_editor
   chmod +x mock_editor
 
-  # Run vimv explicitly on the dotfiles
+  # We rely on vimv to include dotfiles in the temp file here
   run env EDITOR="mock_editor" vimv
 
   # Files should be renamed
