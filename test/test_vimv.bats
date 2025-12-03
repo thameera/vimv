@@ -337,3 +337,25 @@ EOF
   # Nothing was renamed - all original files still exist
   [ -e file1 ] && [ -e file2 ] && [ -e file3 ]
 }
+
+@test "No changes when editor leaves file unchanged" {
+  touch file1 file2
+
+  # Mock editor that does nothing (just exits successfully)
+  MOCK_EDITOR=$(cat <<'EOF'
+#!/usr/bin/env bash
+# Do nothing - leave the file as is
+exit 0
+EOF
+)
+  echo "$MOCK_EDITOR" > mock_editor
+  chmod +x mock_editor
+
+  run env EDITOR="mock_editor" vimv
+
+  assert_success
+  assert_output "0 files renamed."
+
+  # All files still exist with original names
+  [ -e file1 ] && [ -e file2 ]
+}
