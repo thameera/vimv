@@ -359,3 +359,36 @@ EOF
   # All files still exist with original names
   [ -e file1 ] && [ -e file2 ]
 }
+
+@test "Files with spaces and special characters" {
+  touch "file with spaces"
+  touch "file'with'quotes"
+  touch 'file"with"double'
+  touch "file@#\$%special"
+
+  MOCK_EDITOR=$(cat <<'EOF'
+#!/usr/bin/env bash
+# Prefix all lines with "renamed_"
+sed $SED_INPLACE -e 's/^/renamed_/g' "$1"
+EOF
+)
+  echo "$MOCK_EDITOR" > mock_editor
+  chmod +x mock_editor
+
+  run env EDITOR="mock_editor" vimv "file with spaces" "file'with'quotes" 'file"with"double' "file@#\$%special"
+
+  assert_success
+  assert_output "4 files renamed."
+
+  # Renamed files exist
+  [ -e "renamed_file with spaces" ]
+  [ -e "renamed_file'with'quotes" ]
+  [ -e 'renamed_file"with"double' ]
+  [ -e "renamed_file@#\$%special" ]
+
+  # Original files gone
+  [ ! -e "file with spaces" ]
+  [ ! -e "file'with'quotes" ]
+  [ ! -e 'file"with"double' ]
+  [ ! -e "file@#\$%special" ]
+}
